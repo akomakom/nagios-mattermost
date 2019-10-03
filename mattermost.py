@@ -40,10 +40,10 @@ def parse():
     parser.add_argument('--hostalias', help='Host Alias', required=True)
     parser.add_argument('--hostaddress', help='Host Address', required=True)
     parser.add_argument('--hoststate', help='Host State')
-    parser.add_argument('--hostoutput', help='Host Output')
+    parser.add_argument('--hostoutput', help='Host Output', default='')
     parser.add_argument('--servicedesc', help='Service Description')
     parser.add_argument('--servicestate', help='Service State')
-    parser.add_argument('--serviceoutput', help='Service Output')
+    parser.add_argument('--serviceoutput', help='Service Output', default='')
     parser.add_argument('--cgiurl', help='Link to extinfo.cgi on your Nagios instance')
     parser.add_argument('--version', action='version',
                         version='% (prog)s {version}'.format(version=VERSION))
@@ -68,7 +68,10 @@ def emoji(notificationtype):
 
 def text(args):
     template_host = "__{notificationtype}__ {hostalias} is {hoststate}\n{hostoutput}" # noqa
-    template_service = "__{notificationtype}__ {hostalias} at {hostaddress}/{servicedesc} is {servicestate}\n{serviceoutput}" # noqa
+    template_service_with_alias = "__{notificationtype}__ {hostalias} at {hostaddress}/{servicedesc} is {servicestate}\n{serviceoutput}" # noqa
+    template_service_without_alias = "__{notificationtype}__ {hostaddress}/{servicedesc} is {servicestate}\n{serviceoutput}" # noqa
+    template_service = template_service_without_alias if args.hostalias == args.hostaddress else template_service_with_alias
+
     if args.hoststate is not None:
         template_cgiurl = " [View :link:]({cgiurl}?type=1&host={hostalias})"
     elif args.servicestate is not None:
